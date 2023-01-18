@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AnakController;
 use App\Http\Controllers\Api\DesaController;
+use App\Http\Controllers\Api\OrangTuaController;
 use App\Http\Controllers\Api\PosyanduController;
 use App\Http\Controllers\Api\StatistikAnakController;
 use App\Http\Controllers\Api\UploadController;
@@ -24,7 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:sanctum')->get('test', function() {
+Route::middleware('auth:sanctum')->get('test', function () {
     $user = Auth::user();
     return response()->json($user, 200);
 });
@@ -32,11 +33,13 @@ Route::middleware('auth:sanctum')->get('test', function() {
 Route::get('desa', [DesaController::class, 'index']);
 Route::get('posyandu', [PosyanduController::class, 'index']);
 
+
 Route::post('desa', [DesaController::class, 'store']);
 Route::post('posyandu', [PosyanduController::class, 'store']);
 
 
 Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
+    Route::get('data-anak/{id}', [AnakController::class, 'show']);
     Route::post('data-anak', [AnakController::class, 'storeWithOrangTua']);
     Route::get('data-anak', [AnakController::class, 'indexWithOrangTua']);
 
@@ -45,8 +48,10 @@ Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
 });
 
 Route::prefix("posyandu")->middleware('auth:sanctum')->group(function () {
+    Route::get('orang-tua', [OrangTuaController::class, 'index']);
     Route::post('data-anak', [AnakController::class, 'storeWithKaderPosyandu']);
     Route::get('data-anak', [AnakController::class, 'indexWithKaderPosyandu']);
+    Route::get('data-anak/{id}', [AnakController::class, 'show']);
 
     Route::post('statistik-anak', [StatistikAnakController::class, 'store']);
     Route::get('statistik-anak/{statistikAnak}', [StatistikAnakController::class, 'show']);

@@ -20,6 +20,8 @@ class StatistikAnak extends Model
         'z_score_tinggi',
         'z_score_berat',
         'z_score_lingkar_kepala',
+        'date',
+        'id_anak',
     ];
 
     public function anak()
@@ -42,7 +44,7 @@ class StatistikAnak extends Model
             $berat = 'Sangat Kurus';
         }
 
-        if (empty($this->z_score_berat))  {
+        if (empty($this->z_score_berat)) {
             return null;
         }
 
@@ -62,7 +64,7 @@ class StatistikAnak extends Model
             $tinggi = 'Sangat Pendek';
         }
 
-        if (empty($this->z_score_tinggi))  {
+        if (empty($this->z_score_tinggi)) {
             return null;
         }
 
@@ -80,16 +82,10 @@ class StatistikAnak extends Model
             $lingkarKepala = 'Mikrosefali';
         }
 
-        if (empty($this->z_score_lingkar_kepala))  {
+        if (empty($this->z_score_lingkar_kepala)) {
             return null;
         }
 
         return $lingkarKepala;
     }
-
-
-
-    /* public function countZScore(): string { */
-    /*     $age */
-    /* } */
 }

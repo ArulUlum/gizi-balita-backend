@@ -25,19 +25,24 @@ class Anak extends Model
         'berat_terakhir',
         'tinggi_terakhir',
         'lingkar_kepala_terakhir',
+        'id_orang_tua',
+        'id_posyandu',
+        'id_desa',
     ];
 
     /**
-   * @param DateTimeZone $date
+     * @param DateTimeZone $date
      */
-    public function umur($date) {
+    public function umur($date)
+    {
         $tanggalLahir = Carbon::createFromFormat("Y-m-d", $this->tanggal_lahir);
         $carbonDate = Carbon::make($date);
         $umurInBulan = $carbonDate->diffInMonths($tanggalLahir);
         return $umurInBulan;
     }
 
-    public function updateStatistikTerakhir() {
+    public function updateStatistikTerakhir()
+    {
         $statistik = $this->statistik()->orderBy('created_at', 'desc')->first();
         $this->berat_terakhir = $statistik->kategoriBerat();
         $this->tinggi_terakhir = $statistik->kategoriTinggi();
@@ -46,12 +51,14 @@ class Anak extends Model
     }
 
 
-    public function statistikTerakhir() {
+    public function statistikTerakhir()
+    {
         $statistik = $this->statistik()->orderBy('created_at', 'desc')->first();
         return $statistik;
     }
 
-    public function beratTerakhir() {
+    public function beratTerakhir()
+    {
         $statistik = $this->statistik()->orderBy('created_at', 'desc')->first();
         if (empty($statistik)) {
             return null;
@@ -59,14 +66,16 @@ class Anak extends Model
         return $statistik->berat;
     }
 
-    public function tinggiTerakhir() {
+    public function tinggiTerakhir()
+    {
         $statistik = $this->statistik()->orderBy('created_at', 'desc')->first();
         if (empty($statistik)) {
             return null;
         }
         return $statistik->tinggi;
     }
-    public function lingkarKepalaTerakhir() {
+    public function lingkarKepalaTerakhir()
+    {
         $statistik = $this->statistik()->orderBy('created_at', 'desc')->first();
         if (empty($statistik)) {
             return null;
@@ -74,19 +83,23 @@ class Anak extends Model
         return $statistik->lingkar_kepala;
     }
 
-    public function statistik() {
+    public function statistik()
+    {
         return $this->hasMany(StatistikAnak::class, 'id_anak', 'id');
     }
 
-    public function orangTua() {
+    public function orangTua()
+    {
         return $this->belongsTo(User::class, 'id_orang_tua', 'id');
     }
 
-    public function desa() {
+    public function desa()
+    {
         return $this->belongsTo(Desa::class, 'id_desa', 'id');
     }
 
-    public function posyandu() {
+    public function posyandu()
+    {
         return $this->belongsTo(Posyandu::class, 'id_posyandu', 'id');
     }
 }

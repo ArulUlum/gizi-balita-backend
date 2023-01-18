@@ -43,21 +43,24 @@ class StatistikAnakController extends ApiBaseController
         }
 
 
-        $anak = $user->posyandu->anak()->find($request->id_anak);
+        // $anak = $user->posyandu->anak()->find($request->id_anak);
 
-        if ($user->role->name == 'ORANG_TUA') {
-            $anak = $user->anak;
-        }
+        // if ($user->role->name == 'ORANG_TUA') {
+        //     $anak = $user->anak;
+        // }
+
+        $anak = Anak::find($request->id_anak);
 
         if (empty($anak)) {
             return $this->errorUnauthorizedResponse("doesn't belong to this account");
         }
 
         $statistik = $anak->statistik()->create([
+            'id_anak' => $request->id_anak,
             'tinggi' => $request->tinggi,
             'berat' => $request->berat,
             'lingkar_kepala' => $request->lingkar_kepala,
-            'date' => now(),
+            'date' => $request->date,
             'z_score_berat' => $request->z_score_berat,
             'z_score_tinggi' => $request->z_score_tinggi,
             'z_score_lingkar_kepala' => $request->z_score_lingkar_kepala,
@@ -76,13 +79,15 @@ class StatistikAnakController extends ApiBaseController
      */
     public function show(Request $request, $id)
     {
-        $user = User::getUser(Auth::user());
+        // $user = User::getUser(Auth::user());
 
-        $anak = $user->posyandu->anak()->find($id);
+        // $anak = $user->posyandu->anak()->find($id);
 
-        if ($user->role->name == 'ORANG_TUA') {
-            $anak = $user->anak()->find($id);
-        }
+        // if ($user->role->name == 'ORANG_TUA') {
+        //     $anak = $user->anak()->find($id);
+        // }
+
+        $anak = Anak::find($id);
 
         if (empty($anak)) {
             return $this->errorUnauthorizedResponse("doesn't belong to this account");
@@ -90,7 +95,7 @@ class StatistikAnakController extends ApiBaseController
 
         $statistik = $anak->statistik()->get();
         $response = StatistikResource::collection($statistik);
-        
+
 
         return $this->successResponse("list statistik anak", $response);
     }

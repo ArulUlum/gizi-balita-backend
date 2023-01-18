@@ -36,30 +36,34 @@ class AuthenticateUserController extends ApiBaseController
             $data = [
                 'token' => [
                     'type' => "Bearer",
-                    'value' => $user->createToken('API Token')->plainTextToken ,
+                    'value' => $user->createToken('API Token')->plainTextToken,
                 ],
                 'user' => [
+                    'id' => $user->id,
                     'name' => $user->nama,
                     'email' => $user->email,
                     'id_desa' => $user->desa->id,
                     'id_posyandu' => $user->posyandu->id,
+                    'role' => $user->role->role
                 ],
             ];
 
-            if ($user->role->role != $role ){
+            if ($user->role->role != $role) {
                 return $this->errorValidationResponse("periksa kembail email dan password");
-}
+            }
             return $this->successResponse("berhasil login", $data);
         }
 
         return $this->errorValidationResponse("periksa kembail email dan password");
     }
 
-    public function loginOrangTua(Request $request) {
+    public function loginOrangTua(Request $request)
+    {
         return $this->login($request, "ORANG_TUA");
     }
 
-    public function loginKaderPosyandu(Request $request) {
+    public function loginKaderPosyandu(Request $request)
+    {
         return $this->login($request, "KADER_POSYANDU");
     }
 }
