@@ -42,9 +42,11 @@ Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
     Route::get('data-anak/{id}', [AnakController::class, 'show']);
     Route::post('data-anak', [AnakController::class, 'storeWithOrangTua']);
     Route::get('data-anak', [AnakController::class, 'indexWithOrangTua']);
+    Route::put('data-anak/{id}', [AnakController::class, 'update']);
 
     Route::post('statistik-anak', [StatistikAnakController::class, 'store']);
     Route::get('statistik-anak/{statistikAnak}', [StatistikAnakController::class, 'show']);
+    Route::put('statistik-anak/{id}', [StatistikAnakController::class, 'update']);
 });
 
 Route::prefix("posyandu")->middleware('auth:sanctum')->group(function () {
@@ -52,9 +54,13 @@ Route::prefix("posyandu")->middleware('auth:sanctum')->group(function () {
     Route::post('data-anak', [AnakController::class, 'storeWithKaderPosyandu']);
     Route::get('data-anak', [AnakController::class, 'indexWithKaderPosyandu']);
     Route::get('data-anak/{id}', [AnakController::class, 'show']);
+    Route::put('data-anak/{id}', [AnakController::class, 'update']);
+    Route::delete('data-anak/{id}', [AnakController::class, 'destroy']);
 
     Route::post('statistik-anak', [StatistikAnakController::class, 'store']);
     Route::get('statistik-anak/{statistikAnak}', [StatistikAnakController::class, 'show']);
+    Route::put('statistik-anak/{id}', [StatistikAnakController::class, 'update']);
+    Route::delete('statistik-anak/{id}', [StatistikAnakController::class, 'destroy']);
 });
 
 Route::middleware('auth:sanctum')->post('upload-image', [UploadController::class, 'store']);

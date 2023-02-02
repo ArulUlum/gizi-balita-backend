@@ -107,9 +107,13 @@ class StatistikAnakController extends ApiBaseController
      * @param  \App\Models\StatistikAnak  $statistikAnak
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, StatistikAnak $statistikAnak)
+    public function update(Request $request, $id)
     {
-        //
+        $anak = StatistikAnak::findOrFail($id);
+        $anak->fill($request->all());
+        $anak->save();
+
+        return $this->successResponse("Success Update Data Statistik", $anak);
     }
 
     /**
@@ -118,8 +122,11 @@ class StatistikAnakController extends ApiBaseController
      * @param  \App\Models\StatistikAnak  $statistikAnak
      * @return \Illuminate\Http\Response
      */
-    public function destroy(StatistikAnak $statistikAnak)
+    public function destroy($id)
     {
-        //
+        $anak = StatistikAnak::findOrFail($id);
+        $anak->delete();
+
+        return $this->successResponse("Success Delete Data Statistik");
     }
 }

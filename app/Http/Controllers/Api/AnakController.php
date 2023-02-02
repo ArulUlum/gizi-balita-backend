@@ -102,7 +102,7 @@ class AnakController extends ApiBaseController
             'nama' => $request->nama,
             'panggilan' => $request->panggilan,
             'tanggal_lahir' => $request->tanggal_lahir,
-            'alamat' => $user->alamat,
+            'alamat' => $request->alamat,
             // 'nama_orang_tua' => $user->nama,
             'gender' => $request->gender,
             'image' => $request->image,
@@ -215,9 +215,13 @@ class AnakController extends ApiBaseController
      * @param  \App\Models\Anak  $anak
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Anak $anak)
+    public function update(Request $request, $id)
     {
-        //
+        $anak = Anak::findOrFail($id);
+        $anak->fill($request->all());
+        $anak->save();
+
+        return $this->successResponse("Success Update Data Anak", $anak);
     }
 
     /**
@@ -226,8 +230,11 @@ class AnakController extends ApiBaseController
      * @param  \App\Models\Anak  $anak
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Anak $anak)
+    public function destroy($id)
     {
-        //
+        $anak = Anak::findOrFail($id);
+        $anak->delete();
+
+        return $this->successResponse("Success Delete Data Anak");
     }
 }
