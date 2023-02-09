@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Anak;
+use App\Models\StatistikAnak;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -232,6 +233,9 @@ class AnakController extends ApiBaseController
      */
     public function destroy($id)
     {
+        $statistik = StatistikAnak::where('id_anak', $id);
+        $statistik->delete();
+
         $anak = Anak::findOrFail($id);
         $anak->delete();
 

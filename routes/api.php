@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\AnakController;
+use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\DesaController;
 use App\Http\Controllers\Api\OrangTuaController;
+use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PosyanduController;
 use App\Http\Controllers\Api\StatistikAnakController;
 use App\Http\Controllers\Api\UploadController;
@@ -37,6 +39,21 @@ Route::get('posyandu', [PosyanduController::class, 'index']);
 Route::post('desa', [DesaController::class, 'store']);
 Route::post('posyandu', [PosyanduController::class, 'store']);
 
+// START: Endpoint Comment
+Route::get('comment', [CommentController::class, 'index']);
+Route::post('comment', [CommentController::class, 'store']);
+Route::get('comment/{id}', [CommentController::class, 'show']);
+Route::delete('comment/{id}', [CommentController::class, 'destroy']);
+// END: Endpoint Comment
+
+// START: Endpoint Post
+Route::post('post', [PostController::class, 'store']);
+Route::get('post', [PostController::class, 'index']);
+Route::get('post/orang-tua/{id}', [PostController::class, 'showByOrangTua']);
+Route::get('post/{id}', [PostController::class, 'show']);
+Route::put('post/{id}', [PostController::class, 'update']);
+Route::delete('post/{id}', [PostController::class, 'destroy']);
+// END: Endpoint Post
 
 Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
     Route::get('data-anak/{id}', [AnakController::class, 'show']);

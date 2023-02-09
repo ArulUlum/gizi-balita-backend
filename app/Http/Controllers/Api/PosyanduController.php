@@ -63,7 +63,7 @@ class PosyanduController extends ApiBaseController
         ]);
 
         if ($validator->fails()) {
-           return $this->errorValidationResponse("gagal input data posyandu", $validator->errors());
+            return $this->errorValidationResponse("gagal input data posyandu", $validator->errors());
         }
 
         $posyandu = Posyandu::make([
@@ -76,11 +76,10 @@ class PosyanduController extends ApiBaseController
         $posyandu->desa()->associate($request->id_desa);
 
         if (!($posyandu->save())) {
-            return $this->errorValidationResponse("gagal create data desa");
+            return $this->errorValidationResponse("gagal create data Posyandu");
         }
 
         return $this->successResponse("success");
-
     }
 
     /**

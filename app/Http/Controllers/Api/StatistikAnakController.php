@@ -52,7 +52,7 @@ class StatistikAnakController extends ApiBaseController
         $anak = Anak::find($request->id_anak);
 
         if (empty($anak)) {
-            return $this->errorUnauthorizedResponse("doesn't belong to this account");
+            return $this->errorNotFound("Data Anak Tidak Ditemukan");
         }
 
         $statistik = $anak->statistik()->create([
@@ -71,12 +71,7 @@ class StatistikAnakController extends ApiBaseController
         return $this->successResponse("berhasil input statistik anak", $response);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\StatistikAnak  $statistikAnak
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Request $request, $id)
     {
         // $user = User::getUser(Auth::user());
@@ -90,7 +85,7 @@ class StatistikAnakController extends ApiBaseController
         $anak = Anak::find($id);
 
         if (empty($anak)) {
-            return $this->errorUnauthorizedResponse("doesn't belong to this account");
+            return $this->errorNotFound("Data Pekembangan Anak Tidak Ditemukan");
         }
 
         $statistik = $anak->statistik()->get();
@@ -100,32 +95,27 @@ class StatistikAnakController extends ApiBaseController
         return $this->successResponse("list statistik anak", $response);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\StatistikAnak  $statistikAnak
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(Request $request, $id)
     {
         $anak = StatistikAnak::findOrFail($id);
+        if (!$anak) {
+            return $this->errorNotFound("Data Perkembangan Anak Tidak Ditemukan");
+        }
         $anak->fill($request->all());
         $anak->save();
 
         return $this->successResponse("Success Update Data Statistik", $anak);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\StatistikAnak  $statistikAnak
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy($id)
     {
         $anak = StatistikAnak::findOrFail($id);
-        $anak->delete();
+
+        if (!$anak->delete()) {
+            return $this->errorValidationResponse("Gagal Delete Data Perkembangan Anak");
+        }
 
         return $this->successResponse("Success Delete Data Statistik");
     }
