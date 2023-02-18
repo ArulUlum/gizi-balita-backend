@@ -18,24 +18,12 @@ class AnakController extends ApiBaseController
      */
     public function indexWithOrangTua(Request $request)
     {
-        $validator = validator($request->all(), [
-            'offset' => ['integer'],
-            'limit' => ['integer']
-        ]);
-        if ($validator->fails()) {
-            return $this->errorValidationResponse("validation  failed", $validator->errors());
-        }
-        $limit = $request->exists('limit') ? $request->limit : 10;
-        $offset = $request->exists('offset') ? $request->offset : 0;
-
         $orangTua = User::getUser(Auth::user());
 
         $total = $orangTua->anak()->count();
-        $anak = $orangTua->anak()->limit($limit)->offset($offset * $limit)->get();
+        $anak = $orangTua->anak()->get();
 
         $response = [
-            'limit' => $limit,
-            'offset' => $offset,
             'total' => $total,
             'data' => $anak,
         ];
@@ -49,24 +37,12 @@ class AnakController extends ApiBaseController
      */
     public function indexWithKaderPosyandu(Request $request)
     {
-        $validator = validator($request->all(), [
-            'offset' => ['integer'],
-            'limit' => ['integer']
-        ]);
-        if ($validator->fails()) {
-            return $this->errorValidationResponse("validation  failed", $validator->errors());
-        }
-        $limit = $request->exists('limit') ? $request->limit : 10;
-        $offset = $request->exists('offset') ? $request->offset : 0;
-
         $kaderPosyandu = User::getUser(Auth::user());
 
         $total = $kaderPosyandu->posyandu->anak()->count();
-        $anak = $kaderPosyandu->posyandu->anak()->limit($limit)->offset($offset * $limit)->get();
+        $anak = $kaderPosyandu->posyandu->anak()->get();
 
         $response = [
-            'limit' => $limit,
-            'offset' => $offset,
             'total' => $total,
             'data' => $anak,
         ];

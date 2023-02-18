@@ -66,4 +66,14 @@ class AuthenticateUserController extends ApiBaseController
     {
         return $this->login($request, "KADER_POSYANDU");
     }
+
+    public function loginDesa(Request $request)
+    {
+        return $this->login($request, "DESA");
+    }
+
+    public function loginTenagaKesehatan(Request $request)
+    {
+        return $this->login($request, "TENAGA_KESEHATAN");
+    }
 }

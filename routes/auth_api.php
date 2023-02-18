@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('testing', function() {
+Route::get('testing', function () {
     $resp = [
         "code" => 200,
         "message" => "ok",
@@ -33,7 +33,16 @@ Route::prefix("orang-tua")->group(function () {
 Route::prefix("posyandu")->group(function () {
     Route::post('register', [RegisterUserController::class, 'registerKaderPosyandu']);
     Route::post('login', [AuthenticateUserController::class, 'loginKaderPosyandu']);
+});
 
+Route::prefix("desa")->group(function () {
+    Route::post('register', [RegisterUserController::class, 'registerDesa']);
+    Route::post('login', [AuthenticateUserController::class, 'loginDesa']);
+});
+
+Route::prefix("tenaga-kesehatan")->group(function () {
+    Route::post('register', [RegisterUserController::class, 'registerTenagaKesehatan']);
+    Route::post('login', [AuthenticateUserController::class, 'loginTenagaKesehatan']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

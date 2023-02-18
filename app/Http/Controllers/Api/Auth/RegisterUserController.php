@@ -61,4 +61,16 @@ class RegisterUserController extends ApiBaseController
         $role = "KADER_POSYANDU";
         return $this->register($request, $role);
     }
+
+    public function registerDesa(Request $request)
+    {
+        $role = "DESA";
+        return $this->register($request, $role);
+    }
+
+    public function registerTenagaKesehatan(Request $request)
+    {
+        $role = "TENAGA_KESEHATAN";
+        return $this->register($request, $role);
+    }
 }

@@ -45,19 +45,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function role() {
+    public function role()
+    {
         return $this->belongsTo(Role::class, 'id_role', 'id');
     }
 
-    public function desa() {
+    public function desa()
+    {
         return $this->belongsTo(Desa::class, 'id_desa', 'id');
     }
 
-    public function posyandu() {
+    public function posyandu()
+    {
         return $this->belongsTo(Posyandu::class, 'id_posyandu', 'id');
     }
 
-    public function anak() {
+    public function anak()
+    {
         return $this->hasMany(Anak::class, 'id_orang_tua', 'id');
     }
 
@@ -65,7 +69,8 @@ class User extends Authenticatable
      * @param \Illuminate\Contracts\Auth\Authenticatable $auth
      * @return User
      */
-    public static function getUser($user) : User {
+    public static function getUser($user): User
+    {
         return $user;
     }
 }
