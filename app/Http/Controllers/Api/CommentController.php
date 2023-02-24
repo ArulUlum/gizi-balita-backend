@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,16 +14,30 @@ class CommentController extends ApiBaseController
 
     public function index()
     {
-        $comment = Comment::all();
+        $comment = Comment::with('user')->with('post')->get();
 
-        return $this->successResponse("Data Post", $comment);
+        foreach ($comment as $key => $data) {
+            $response[$key] = [
+                "comment_id" => $data->id,
+                "post_id" => $data->post_id,
+                "title_post" => $data->post->title,
+                "content" => $data->post->content,
+                "user_id" => $data->user_id,
+                "nama" => $data->user->nama,
+                "email" => $data->user->email,
+                "comment" => $data->content,
+                "time" => Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at)->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return $this->successResponse("Data Post", $response);
     }
 
     public function store(Request $request)
     {
         $validator = validator($request->all(), [
-            'id_user' => ['required', 'integer'],
-            'id_post' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
+            'post_id' => ['required', 'integer'],
             'content' => ['required', 'string'],
         ]);
 
@@ -30,19 +45,19 @@ class CommentController extends ApiBaseController
             return $this->errorValidationResponse("Inputan TIdak Sesuai", $validator->errors());
         }
 
-        if (User::where('id', $request->id_user)->doesntExist()) {
+        if (User::where('id', $request->user_id)->doesntExist()) {
             return $this->errorNotFound("User Tidak Ditemukan");
         }
 
-        if (Post::where('id', $request->id_post)->doesntExist()) {
+        if (Post::where('id', $request->post_id)->doesntExist()) {
             return $this->errorNotFound("Post Tidak Ditemukan");
         }
 
         $comment = new Comment();
 
         $comment->fill([
-            'id_user' => $request->id_user,
-            'id_post' => $request->id_post,
+            'user_id' => $request->user_id,
+            'post_id' => $request->post_id,
             'content' => $request->content,
         ]);
 
@@ -53,13 +68,26 @@ class CommentController extends ApiBaseController
 
     public function show($id)
     {
-        $comment = DB::table('comments')->where('id_post', $id)->get();
+        $comment = Post::find($id)->comments->all();
 
         if (empty($comment)) {
-            return $this->errorNotFound("Data Comment tidak ditemukan");
+            return $this->errorNotFound("Data Post tidak ditemukan");
         }
 
-        return $this->successResponse("Data Comment", $comment);
+        foreach ($comment as $key => $data) {
+            $user = User::find($data->user_id);
+
+            $response[$key] = [
+                "user_id" => $user->id,
+                "nama" => $user->nama,
+                "email" => $user->email,
+                "comment_id" => $data->id,
+                "content" => $data->content,
+                "time" => Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at)->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return $this->successResponse("Data Comment", $response);
     }
 
 

@@ -65,6 +65,15 @@ class User extends Authenticatable
         return $this->hasMany(Anak::class, 'id_orang_tua', 'id');
     }
 
+    public function post()
+    {
+        return $this->hasMany(Post::class, 'user_id', 'id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'user_id', 'id');
+    }
     /**
      * @param \Illuminate\Contracts\Auth\Authenticatable $auth
      * @return User

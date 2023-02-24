@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Post;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,15 +13,26 @@ class PostController extends ApiBaseController
 
     public function index()
     {
-        $post = Post::all();
+        $post = Post::with('user')->get();
 
-        return $this->successResponse("Data Post", $post);
+        foreach ($post as $key => $data) {
+            $response[$key] = [
+                "post_id" => $data->id,
+                "user_id" => $data->user->id,
+                "nama" => $data->user->nama,
+                "title" => $data->title,
+                "content" => $data->content,
+                "time" => Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at)->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return $this->successResponse("Data Post", $response);
     }
 
     public function store(Request $request)
     {
         $validator = validator($request->all(), [
-            'id_user' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'title' => ['required', 'string'],
             'content' => ['required', 'string'],
         ]);
@@ -29,7 +41,7 @@ class PostController extends ApiBaseController
             return $this->errorValidationResponse("Input Masih Tidak Sesuai", $validator->errors());
         }
 
-        $user = DB::table('users')->where('id', $request->id_user)->get();
+        $user = DB::table('users')->where('id', $request->user_id)->get();
 
         if (empty($user)) {
             return $this->errorNotFound("User Tidak Ditemukan");
@@ -40,7 +52,7 @@ class PostController extends ApiBaseController
         $post = new Post();
 
         $post->fill([
-            'id_user' => $request->id_user,
+            'user_id' => $request->user_id,
             'title' => $request->title,
             'content' => $request->content,
         ]);
@@ -53,24 +65,43 @@ class PostController extends ApiBaseController
 
     public function showByOrangTua($id)
     {
-        $post = DB::table('posts')->where('id_user', $id)->get();
+        $user = User::find($id)->post->all();
 
-        if (empty($post)) {
-            return $this->errorNotFound("Data Post tidak ditemukan");
+        if (empty($user)) {
+            return $this->errorNotFound("Data Orang Tua tidak ditemukan");
         }
 
-        return $this->successResponse("Data Post", $post);
+        foreach ($user as $key => $data) {
+            $response[$key] = [
+                "post_id" => $data->id,
+                "title" => $data->title,
+                "content" => $data->content,
+                "time" => Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at)->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return $this->successResponse("Data Post", $response);
     }
 
     public function show($id)
     {
-        $post = Post::findOrFail($id);
+        $post = Post::find($id);
 
         if (empty($post)) {
             return $this->errorNotFound("Data Post tidak ditemukan");
         }
 
-        return $this->successResponse("Data Post", $post);
+        $user = User::find($post->user_id);
+
+        $response = [
+            "user_id" => $user->id,
+            "nama" => $user->nama,
+            "title" => $post->title,
+            "content" => $post->content,
+            "time" => Carbon::createFromFormat('Y-m-d H:i:s', $post->created_at)->format('Y-m-d H:i:s')
+        ];
+
+        return $this->successResponse("Data Post", $response);
     }
 
 
@@ -83,7 +114,7 @@ class PostController extends ApiBaseController
         }
 
         $validator = validator($request->all(), [
-            'id_user' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'title' => ['required', 'string'],
             'content' => ['required', 'string'],
         ]);
@@ -92,12 +123,12 @@ class PostController extends ApiBaseController
             return $this->errorValidationResponse("Input Masih Tidak Sesuai", $validator->errors());
         }
 
-        if (User::where('id', $request->id_user)->doesntExist()) {
+        if (User::where('id', $request->user_id)->doesntExist()) {
             return $this->errorNotFound("User Tidak Ditemukan");
         }
 
         $post->fill([
-            'id_user' => $request->id_user,
+            'user_id' => $request->user_id,
             'title' => $request->title,
             'content' => $request->content,
         ]);

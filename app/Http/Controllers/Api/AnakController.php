@@ -63,16 +63,12 @@ class AnakController extends ApiBaseController
             'nama' => ['required', 'string', 'min:3'],
             'panggilan' => ['string'],
             'tanggal_lahir' => ['required', 'date'],
-            // 'tinggi' => ['required'],
-            // 'berat' => ['required'],
-            // 'lingkar_kepala' => ['required'],
             'gender' => ['required', Rule::in(['LAKI_LAKI', 'PEREMPUAN'])],
             'image' => ['string'],
-            // 'id_orang_tua' => ['required'],
         ]);
 
         if ($validator->fails()) {
-            return $this->errorValidationResponse("gagal input data anak", $validator->errors());
+            return $this->errorValidationResponse("Gagal Input Data Anak", $validator->errors());
         }
 
         $anak = Anak::create([
@@ -80,32 +76,16 @@ class AnakController extends ApiBaseController
             'panggilan' => $request->panggilan,
             'tanggal_lahir' => $request->tanggal_lahir,
             'alamat' => $request->alamat,
-            // 'nama_orang_tua' => $user->nama,
             'gender' => $request->gender,
             'image' => $request->image,
             'id_posyandu' => $user->id_posyandu,
             'id_desa' => $user->id_desa,
             'id_orang_tua' => $user->id
-            // 'berat_terakhir' => $request->berat,
-            // 'tinggi_terakhir' => $request->tinggi,
-            // 'lingkar_kepala_terakhir' => $request->lingkar_kepala,
         ]);
 
-        // $anak->desa()->associate($user->desa);
-        // $anak->posyandu()->associate($user->posyandu);
-        // $anak->orangTua()->associate($user);
-
         $anak->save();
-        // $anak->statistik()->create([
-        //     'tinggi' => $request->tinggi,
-        //     'berat' => $request->berat,
-        //     'lingkar_kepala' => $request->lingkar_kepala,
-        //     'date' => now(),
-        // ]);
 
-
-        // $anak->push();
-        return $this->successResponse("success");
+        return $this->successResponse("Success");
     }
 
     /**
@@ -121,10 +101,6 @@ class AnakController extends ApiBaseController
             'nama' => ['required', 'string', 'min:3'],
             'panggilan' => ['string'],
             'tanggal_lahir' => ['required', 'date'],
-            // 'tinggi' => ['required'],
-            // 'berat' => ['required'],
-            /* 'lingkar_kepala' => ['required'], */
-            // 'nama_orang_tua' => ['required', 'string'],
             'alamat' => ['string'],
             'gender' => ['required', Rule::in(['LAKI_LAKI', 'PEREMPUAN'])],
             'image' => ['string'],
@@ -132,7 +108,7 @@ class AnakController extends ApiBaseController
         ]);
 
         if ($validator->fails()) {
-            return $this->errorValidationResponse("gagal input data anak", $validator->errors());
+            return $this->errorValidationResponse("Gagal Input Data Anak", $validator->errors());
         }
 
         $anak = new Anak;
@@ -142,7 +118,6 @@ class AnakController extends ApiBaseController
             'panggilan' => $request->panggilan,
             'tanggal_lahir' => $request->tanggal_lahir,
             'alamat' => $request->alamat,
-            // 'nama_orang_tua' => $request->nama_orang_tua,
             'gender' => $request->gender,
             'image' => $request->image,
             'id_orang_tua' => $request->id_orang_tua,
@@ -150,22 +125,9 @@ class AnakController extends ApiBaseController
             'id_desa' => $user->id_desa,
         ]);
 
-        // $anak->desa()->associate($user->desa);
-        // $anak->posyandu()->associate($user->posyandu);
-
         $anak->save();
-        // $anak->statistik()->create([
-        //     'tinggi' => $request->tinggi,
-        //     'berat' => $request->berat,
-        //     'lingkar_kepala' => $request->lingkar_kepala,
-        //     'z_score_berat' => $request->z_score_berat,
-        //     'z_score_tinggi' => $request->z_score_tinggi,
-        //     'z_score_lingkar_kepala' => $request->z_score_lingkar_kepala,
-        //     'date' => now(),
-        // ]);
 
-        // $anak->push();
-        return $this->successResponse("success");
+        return $this->successResponse("Success");
     }
 
     /**
@@ -182,7 +144,7 @@ class AnakController extends ApiBaseController
             'data' => $anak,
         ];
 
-        return $this->successResponse("data anak", $response);
+        return $this->successResponse("Data Anak", $response);
     }
 
     /**
