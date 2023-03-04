@@ -33,11 +33,12 @@ Route::middleware('auth:sanctum')->get('test', function () {
 });
 
 Route::get('desa', [DesaController::class, 'index']);
-Route::get('posyandu', [PosyanduController::class, 'index']);
-
-
 Route::post('desa', [DesaController::class, 'store']);
+Route::delete('desa/{id}', [DesaController::class, 'destroy']);
+
+Route::get('posyandu', [PosyanduController::class, 'index']);
 Route::post('posyandu', [PosyanduController::class, 'store']);
+Route::delete('posyandu/{id}', [PosyanduController::class, 'destroy']);
 
 // START: Endpoint Comment
 Route::get('comment', [CommentController::class, 'index']);
@@ -54,6 +55,8 @@ Route::get('post/{id}', [PostController::class, 'show']);
 Route::put('post/{id}', [PostController::class, 'update']);
 Route::delete('post/{id}', [PostController::class, 'destroy']);
 // END: Endpoint Post
+
+Route::get('export-data-anak-csv', [AnakController::class, 'exportDataAnakCSV']);
 
 Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
     Route::get('data-anak/{id}', [AnakController::class, 'show']);

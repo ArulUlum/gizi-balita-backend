@@ -29,25 +29,15 @@ class StatistikAnakController extends ApiBaseController
      */
     public function store(Request $request)
     {
-        $user = User::getUser(Auth::user());
-
         $validator = validator($request->all(), [
             'id_anak' => ['required', 'integer', 'exists:data_anak,id'],
             'tinggi' => ['required'],
             'berat' => ['required'],
-            /* 'lingkar_kepala' => ['required'], */
         ]);
 
         if ($validator->fails()) {
             return $this->errorValidationResponse("gagal input data anak", $validator->errors());
         }
-
-
-        // $anak = $user->posyandu->anak()->find($request->id_anak);
-
-        // if ($user->role->name == 'ORANG_TUA') {
-        //     $anak = $user->anak;
-        // }
 
         $anak = Anak::find($request->id_anak);
 
@@ -55,7 +45,37 @@ class StatistikAnakController extends ApiBaseController
             return $this->errorNotFound("Data Anak Tidak Ditemukan");
         }
 
-        $statistik = $anak->statistik()->create([
+        if ($request->z_score_berat <= -3) {
+            $status_berat_badan = 'Sangat Kurus';
+        } else if ($request->z_score_berat > -3 && $request->z_score_berat <= -2) {
+            $status_berat_badan = 'Kurus';
+        } else if ($request->z_score_berat > -2 && $request->z_score_berat <= 1) {
+            $status_berat_badan = 'Normal';
+        } else if ($request->z_score_berat > 1 && $request->z_score_berat <= 2) {
+            $status_berat_badan = 'Gemuk';
+        } else if ($request->z_score_berat > 2) {
+            $status_berat_badan = 'Obesitas';
+        }
+
+        if ($request->z_score_tinggi <= -3) {
+            $status_tinggi_badan = 'Sangat Pendek';
+        } else if ($request->z_score_tinggi > -3 && $request->z_score_tinggi <= -2) {
+            $status_tinggi_badan = 'Pendek';
+        } else if ($request->z_score_tinggi > -2 && $request->z_score_tinggi <= 3) {
+            $status_tinggi_badan = 'Normal';
+        } else if ($request->z_score_tinggi > 3) {
+            $status_tinggi_badan = 'Tinggi';
+        }
+
+        if ($request->z_score_lingkar_kepala > 2) {
+            $status_lingkar_kepala = 'Makrosefalus';
+        } else if ($request->z_score_lingkar_kepala > -2 && $request->z_score_lingkar_kepala <= 2) {
+            $status_lingkar_kepala = 'Normal';
+        } else if ($request->z_score_lingkar_kepala < -2) {
+            $status_lingkar_kepala = 'Microcephaly';
+        }
+
+        $statistik = StatistikAnak::create([
             'id_anak' => $request->id_anak,
             'tinggi' => $request->tinggi,
             'berat' => $request->berat,
@@ -64,24 +84,19 @@ class StatistikAnakController extends ApiBaseController
             'z_score_berat' => $request->z_score_berat,
             'z_score_tinggi' => $request->z_score_tinggi,
             'z_score_lingkar_kepala' => $request->z_score_lingkar_kepala,
+            'status_berat_badan' => $status_berat_badan,
+            'status_tinggi_badan' => $status_tinggi_badan,
+            'status_lingkar_kepala' => $status_lingkar_kepala,
         ]);
 
-        $response = new StatistikResource($statistik);
+        $statistik->save();
 
-        return $this->successResponse("berhasil input statistik anak", $response);
+        return $this->successResponse("Success");
     }
 
 
-    public function show(Request $request, $id)
+    public function show($id)
     {
-        // $user = User::getUser(Auth::user());
-
-        // $anak = $user->posyandu->anak()->find($id);
-
-        // if ($user->role->name == 'ORANG_TUA') {
-        //     $anak = $user->anak()->find($id);
-        // }
-
         $anak = Anak::find($id);
 
         if (empty($anak)) {

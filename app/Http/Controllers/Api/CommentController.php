@@ -24,6 +24,7 @@ class CommentController extends ApiBaseController
                 "content" => $data->post->content,
                 "user_id" => $data->user_id,
                 "nama" => $data->user->nama,
+                "role" => $data->role->role,
                 "email" => $data->user->email,
                 "comment" => $data->content,
                 "time" => Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at)->format('Y-m-d H:i:s'),
@@ -80,6 +81,7 @@ class CommentController extends ApiBaseController
             $response[$key] = [
                 "user_id" => $user->id,
                 "nama" => $user->nama,
+                "role" => $user->role->role,
                 "email" => $user->email,
                 "comment_id" => $data->id,
                 "content" => $data->content,

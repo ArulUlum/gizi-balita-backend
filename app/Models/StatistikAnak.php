@@ -22,6 +22,9 @@ class StatistikAnak extends Model
         'z_score_lingkar_kepala',
         'date',
         'id_anak',
+        "status_berat_badan",
+        "status_tinggi_badan",
+        "status_lingkar_kepala"
     ];
 
     public function anak()

@@ -7,51 +7,13 @@ use App\Models\Posyandu;
 
 class PosyanduController extends ApiBaseController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
-        $validator = validator($request->all(), [
-            'offset' => ['integer'],
-            'limit' => ['integer'],
-            'id_desa' => ['integer'],
-        ]);
+        $posyandu = Posyandu::all();
 
-        $limit = $request->exists('limit') ? $request->limit : 10;
-        $offset = $request->exists('offset') ? $request->offset : 0;
-
-        if ($validator->fails()) {
-            return $this->errorValidationResponse("validation  failed", $validator->errors());
-        }
-
-        $posyandu = new Posyandu;
-
-        if ($request->exists('id_desa')) {
-            $posyandu = $posyandu->where('id_desa', $request->id_desa);
-        }
-
-        $total = $posyandu->count();
-        $posyandu = $posyandu->limit($limit)->offset($offset * $limit)->get();
-
-        $response = [
-            'limit' => $limit,
-            'offset' => $offset,
-            'total' => $total,
-            'data' => $posyandu,
-        ];
-
-        return $this->successResponse("data posyandu", $response);
+        return $this->successResponse("data posyandu", $posyandu);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $validator = validator($request->all(), [
@@ -82,37 +44,26 @@ class PosyanduController extends ApiBaseController
         return $this->successResponse("success");
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        $posyandu = Posyandu::findOrFail($id);
+
+        if (empty($posyandu)) {
+            return $this->errorNotFound("Posyandu tidak ditemukan");
+        }
+
+        $posyandu->delete();
+
+        return $this->successResponse("Success Delete Posyandu");
     }
 }

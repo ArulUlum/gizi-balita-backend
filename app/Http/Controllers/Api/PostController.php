@@ -20,6 +20,7 @@ class PostController extends ApiBaseController
                 "post_id" => $data->id,
                 "user_id" => $data->user->id,
                 "nama" => $data->user->nama,
+                "role" => $data->user->role->role,
                 "title" => $data->title,
                 "content" => $data->content,
                 "time" => Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at)->format('Y-m-d H:i:s'),
@@ -96,6 +97,7 @@ class PostController extends ApiBaseController
         $response = [
             "user_id" => $user->id,
             "nama" => $user->nama,
+            "role" => $user->role->role,
             "title" => $post->title,
             "content" => $post->content,
             "time" => Carbon::createFromFormat('Y-m-d H:i:s', $post->created_at)->format('Y-m-d H:i:s')

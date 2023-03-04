@@ -16,32 +16,12 @@ class DesaController extends ApiBaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $validator = validator($request->all(), [
-            'offset' => ['integer'],
-            'limit' => ['integer']
-        ]);
-        if ($validator->fails()) {
-            return $this->errorValidationResponse("validation  failed", $validator->errors());
-        }
-        $limit = $request->exists('limit') ? $request->limit : 10;
-        $offset = $request->exists('offset') ? $request->offset : 0;
 
-        $desa = new Desa;
-        $total = $desa->count();
-        $desa = $desa->limit($limit)->offset($offset * $limit)->get();
+        $desa = Desa::all();
 
-        $data = DesaResource::collection($desa);
-
-        $response = [
-            'limit' => $limit,
-            'offset' => $offset,
-            'total' => $total,
-            'data' => $data,
-        ];
-
-        return $this->successResponse("data desa", $response);
+        return $this->successResponse("data desa", $desa);
     }
 
     /**
@@ -52,12 +32,12 @@ class DesaController extends ApiBaseController
      */
     public function store(Request $request)
     {
-        $validator = validator($request->all(),[
+        $validator = validator($request->all(), [
             'nama' => ['required', 'string']
         ]);
 
         if ($validator->fails()) {
-           return $this->errorValidationResponse("gagal input data desa", $validator->errors());
+            return $this->errorValidationResponse("gagal input data desa", $validator->errors());
         }
 
         $desa = Desa::make([
@@ -77,7 +57,7 @@ class DesaController extends ApiBaseController
      * @param  \App\Models\Desa  $desa
      * @return \Illuminate\Http\Response
      */
-    public function show(Desa $desa)
+    public function show($id)
     {
         //
     }
@@ -89,7 +69,7 @@ class DesaController extends ApiBaseController
      * @param  \App\Models\Desa  $desa
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Desa $desa)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -100,8 +80,16 @@ class DesaController extends ApiBaseController
      * @param  \App\Models\Desa  $desa
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Desa $desa)
+    public function destroy($id)
     {
-        //
+        $desa = Desa::findOrFail($id);
+
+        if (empty($desa)) {
+            return $this->errorNotFound("Desa tidak ditemukan");
+        }
+
+        $desa->delete();
+
+        return $this->successResponse("Success Delete Desa");
     }
 }
