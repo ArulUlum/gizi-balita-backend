@@ -211,8 +211,7 @@ class AnakController extends ApiBaseController
             'Alamat', 'Tanggal Pengukuran', 'Berat', 'Tinggi', 'Lingkar Kepala',
             'BB/U', 'Z - BB/U', 'TB/U', 'Z - TB/U', 'LK/U', 'Z - LK/U'
         );
-        // $columns = array('No', 'NIK', 'Nama', 'JK', 'Tanggal Lahir', 'Nama Orang Tua', 'Posyandu', 'Alamat', 'Tanggal Pengukuran', 'Berat', 'Tinggi', 'Lingkar Kepala', 'BB/U', 'Z - BB/U', 'TB/U', 'Z - TB/U', 'LK/U', 'Z - LK/U');
-        // $columns = array('No', 'Nama', 'JK', 'Tanggal Lahir', 'Nama Orang Tua', 'Posyandu', 'Alamat');
+
 
         $callback = function () use ($collection, $columns) {
             $file = fopen('php://output', 'w');
@@ -231,12 +230,11 @@ class AnakController extends ApiBaseController
                 $row['Berat']  = $data->berat;
                 $row['Tinggi']  = $data->tinggi;
                 $row['Lingkar Kepala']  = $data->lingkar_kepala;
-                $row['BB/U']  = "Baik";
+                $row['BB/U']  = $this->beratBadan($data->z_score_berat);
                 $row['ZS - BB/U']  = $data->z_score_berat;
-
-                $row['TB/U']  = "Baik";
+                $row['TB/U']  = $this->tinggiBadan($data->z_score_tinggi);
                 $row['ZS - TB/U']  = $data->z_score_tinggi;
-                $row['LK/U']  = "Baik";
+                $row['LK/U']  = $this->lingkarKepala($data->z_score_lingkar_kepala);
                 $row['ZS - LK/U']  = $data->z_score_lingkar_kepala;
 
                 fputcsv($file, array(
@@ -244,13 +242,50 @@ class AnakController extends ApiBaseController
                     $row['Alamat'], $row['Tanggal Pengukuran'], $row['Berat'], $row['Tinggi'], $row['Lingkar Kepala'],
                     $row['BB/U'], $row['ZS - BB/U'], $row['TB/U'], $row['ZS - TB/U'], $row['LK/U'], $row['ZS - LK/U']
                 ));
-                // fputcsv($file, array($row['No'], $row['NIK'], $row['Nama'], $row['JK'], $row['Tanggal Lahir'], $row['Nama Orang Tua'], $row['Posyandu'], $row['Alamat'], $row['Tanggal Pengukuran'], $row['Berat'], $row['Tinggi'], $row['Lingkar Kepala'], $row['BB/U'], $row['ZS - BB/U'], $row['TB/U'], $row['ZS - TB/U'], $row['LK/U'], $row['ZS - LK/U']));
-                // fputcsv($file, array($row['No'], $row['Nama'], $row['JK'], $row['Tanggal Lahir'], $row['Nama Orang Tua'], $row['Posyandu'], $row['Alamat']));
             }
 
             fclose($file);
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function beratBadan($ZScoreBerat)
+    {
+        if ($ZScoreBerat <= -3) {
+            return 'Sangat Kurus';
+        } else if ($ZScoreBerat > -3 && $ZScoreBerat <= -2) {
+            return 'Kurus';
+        } else if ($ZScoreBerat > -2 && $ZScoreBerat <= 1) {
+            return 'Normal';
+        } else if ($ZScoreBerat > 1 && $ZScoreBerat <= 2) {
+            return 'Gemuk';
+        } else if ($ZScoreBerat > 2) {
+            return 'Obesitas';
+        }
+    }
+
+    public function tinggiBadan($ZScoreTinggi)
+    {
+        if ($ZScoreTinggi <= -3) {
+            return 'Sangat Pendek';
+        } else if ($ZScoreTinggi > -3 && $ZScoreTinggi <= -2) {
+            return 'Pendek';
+        } else if ($ZScoreTinggi > -2 && $ZScoreTinggi <= 3) {
+            return 'Normal';
+        } else if ($ZScoreTinggi > 3) {
+            return 'Tinggi';
+        }
+    }
+
+    public function lingkarKepala($ZScoreLingkarKepala)
+    {
+        if ($ZScoreLingkarKepala > 2) {
+            return 'Makrosefalus';
+        } else if ($ZScoreLingkarKepala > -2 && $ZScoreLingkarKepala <= 2) {
+            return 'Normal';
+        } else if ($ZScoreLingkarKepala < -2) {
+            return 'Microcephaly';
+        }
     }
 }

@@ -5,12 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-use DateTimeZone;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Anak extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'data_anak';
 
@@ -30,9 +28,6 @@ class Anak extends Model
         'id_desa',
     ];
 
-    /**
-     * @param DateTimeZone $date
-     */
     public function umur($date)
     {
         $tanggalLahir = Carbon::createFromFormat("Y-m-d", $this->tanggal_lahir);
