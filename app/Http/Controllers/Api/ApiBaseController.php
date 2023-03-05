@@ -11,11 +11,8 @@ class ApiBaseController extends Controller
         $response = [
             "code" => 200,
             "message" => $message,
+            "data" => $data
         ];
-
-        if (!empty($data)) {
-            $response['data'] = $data;
-        }
 
         return response()->json($response, 200);
     }

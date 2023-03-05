@@ -15,6 +15,7 @@ class CommentController extends ApiBaseController
     public function index()
     {
         $comment = Comment::with('user')->with('post')->get();
+        $response = [];
 
         foreach ($comment as $key => $data) {
             $response[$key] = [
@@ -74,6 +75,8 @@ class CommentController extends ApiBaseController
         if (empty($comment)) {
             return $this->errorNotFound("Data Post tidak ditemukan");
         }
+
+        $response = [];
 
         foreach ($comment as $key => $data) {
             $user = User::find($data->user_id);

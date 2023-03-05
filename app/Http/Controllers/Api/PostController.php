@@ -14,6 +14,7 @@ class PostController extends ApiBaseController
     public function index()
     {
         $post = Post::with('user')->get();
+        $response = [];
 
         foreach ($post as $key => $data) {
             $response[$key] = [
@@ -35,7 +36,7 @@ class PostController extends ApiBaseController
         $validator = validator($request->all(), [
             'user_id' => ['required', 'integer'],
             'title' => ['required', 'string'],
-            'content' => ['required', 'string'],
+            'content' => ['string'],
         ]);
 
         if ($validator->fails()) {
@@ -71,6 +72,8 @@ class PostController extends ApiBaseController
         if (empty($user)) {
             return $this->errorNotFound("Data Orang Tua tidak ditemukan");
         }
+
+        $response = [];
 
         foreach ($user as $key => $data) {
             $response[$key] = [
@@ -118,7 +121,7 @@ class PostController extends ApiBaseController
         $validator = validator($request->all(), [
             'user_id' => ['required', 'integer'],
             'title' => ['required', 'string'],
-            'content' => ['required', 'string'],
+            'content' => ['string'],
         ]);
 
         if ($validator->fails()) {

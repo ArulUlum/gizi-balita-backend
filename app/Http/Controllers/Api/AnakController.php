@@ -129,11 +129,7 @@ class AnakController extends ApiBaseController
     {
         $anak = Anak::findOrFail($id);
 
-        $response = [
-            'data' => $anak,
-        ];
-
-        return $this->successResponse("Data Anak", $response);
+        return $this->successResponse("Data Anak", $anak);
     }
 
     /**
