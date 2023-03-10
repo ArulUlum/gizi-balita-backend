@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\DesaResource;
 use App\Models\Desa;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 class DesaController extends ApiBaseController
 {
@@ -91,5 +91,61 @@ class DesaController extends ApiBaseController
         $desa->delete();
 
         return $this->successResponse("Success Delete Desa");
+    }
+
+    public function getStatistikDesa($id)
+    {
+        $desa = Desa::findOrFail($id);
+
+        if (empty($desa)) {
+            return $this->errorNotFound("Desa tidak ditemukan");
+        }
+
+        $response = [];
+        $all_posyandu = $desa->posyandu;
+        $latestStatistik = null;
+
+        foreach ($all_posyandu as $key => $posyandu) {
+            if (!empty($posyandu->anak)) {
+                foreach ($posyandu->anak as $anak) {
+                    $latestStatistik = DB::table('data_statistik_anak')->where('id_anak', $anak->id)->latest('created_at')->first();
+                }
+
+                $response[$key] = [
+                    "id_posyandu" => $posyandu->id,
+                    "nama_posyandu" => $posyandu->nama,
+                    "jumlah_anak" => $posyandu->jumlahAnak(),
+                    "berat_badan" => $posyandu->laporanBerat($latestStatistik),
+                    "tinggi_badan" => $posyandu->laporanTinggi($latestStatistik),
+                    "lingkar_kepala" => $posyandu->laporanLingkarKepala($latestStatistik),
+                ];
+            }
+
+            $response[$key] = [
+                "id_posyandu" => $posyandu->id,
+                "nama_posyandu" => $posyandu->nama,
+                "jumlah_anak" => 0,
+                "berat_badan" => [
+                    'obesitas' => 0,
+                    'gemuk' => 0,
+                    'normal' => 0,
+                    'kurus' => 0,
+                    'sangat_kurus' => 0,
+                ],
+                "tinggi_badan" => [
+                    'tinggi' => 0,
+                    'normal' => 0,
+                    'pendek' => 0,
+                    'sangat_pendek' =>  0,
+                ],
+                "lingkar_kepala" => [
+                    'makrosefali' => 0,
+                    'normal' => 0,
+                    'mikrosefali' => 0,
+                ],
+            ];
+        };
+
+        return $this->successResponse("Data Statistik Desa", $response);
     }
 }

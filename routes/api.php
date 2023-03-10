@@ -58,6 +58,8 @@ Route::delete('post/{id}', [PostController::class, 'destroy']);
 
 Route::get('export-data-anak-csv', [AnakController::class, 'exportDataAnakCSV']);
 
+Route::get('statistik-gizi/{id}', [DesaController::class, 'getStatistikDesa']);
+
 Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
     Route::get('data-anak/{id}', [AnakController::class, 'show']);
     Route::post('data-anak', [AnakController::class, 'storeWithOrangTua']);

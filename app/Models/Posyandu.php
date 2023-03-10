@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Posyandu extends Model
 {
@@ -28,46 +29,84 @@ class Posyandu extends Model
         return $this->hasMany(Anak::class, 'id_posyandu', 'id');
     }
 
-    public function laporanBerat()
+    public function jumlahAnak()
     {
-        $obesitas = $this->anak()->where('berat_terakhir', 'Obesitas')->count();
-        $gemuk = $this->anak()->where('berat_terakhir', 'Gemuk')->count();
-        $normal = $this->anak()->where('berat_terakhir', 'Normal')->count();
-        $kurus = $this->anak()->where('berat_terakhir', 'Kurus')->count();
-        $sangatKurus = $this->anak()->where('berat_terakhir', 'Sangat Kurus')->count();
+        return $this->anak()->count();
+    }
+
+    public function laporanBerat($latestStatistik)
+    {
+        $obesitas = 0;
+        $gemuk = 0;
+        $normal = 0;
+        $kurus = 0;
+        $sangatKurus = 0;
+
+        if ($latestStatistik->status_berat_badan == 'Obesitas') {
+            $obesitas++;
+        } else if ($latestStatistik->status_berat_badan == 'Gemuk') {
+            $gemuk++;
+        } else if ($latestStatistik->status_berat_badan == 'Normal') {
+            $normal++;
+        } else if ($latestStatistik->status_berat_badan == 'Kurus') {
+            $kurus++;
+        } else if ($latestStatistik->status_berat_badan == 'Sangat Kurus') {
+            $sangatKurus++;
+        }
 
         return [
-            'obesitas' =>       $obesitas,
-            'gemuk' =>       $gemuk,
-            'normal' =>       $normal,
-            'kurus' =>       $kurus,
-            'sangat_kurus' =>       $sangatKurus,
+            'obesitas' => $obesitas,
+            'gemuk' => $gemuk,
+            'normal' => $normal,
+            'kurus' => $kurus,
+            'sangat_kurus' => $sangatKurus,
         ];
     }
 
-    public function laporanTinggi()
+    public function laporanTinggi($latestStatistik)
     {
-        $tinggi = $this->anak()->where('tinggi_terakhir', 'Tinggi')->count();
-        $normal = $this->anak()->where('tinggi_terakhir', 'Normal')->count();
-        $pendek = $this->anak()->where('tinggi_terakhir', 'Pendek')->count();
-        $sangatPendek = $this->anak()->where('tinggi_terakhir', 'Sangat Pendek')->count();
+
+        $tinggi = 0;
+        $normal = 0;
+        $pendek = 0;
+        $sangatPendek = 0;
+
+        if ($latestStatistik->status_tinggi_badan == 'Tinggi') {
+            $tinggi++;
+        } else if ($latestStatistik->status_tinggi_badan == 'Normal') {
+            $normal++;
+        } else if ($latestStatistik->status_tinggi_badan == 'Pendek') {
+            $pendek++;
+        } else if ($latestStatistik->status_tinggi_badan == 'Sangat Pendek') {
+            $sangatPendek++;
+        }
+
         return [
-            'tinggi' =>       $tinggi,
-            'normal' =>       $normal,
-            'pendek' =>       $pendek,
-            'sangat_pendek' =>       $sangatPendek,
+            'tinggi' => $tinggi,
+            'normal' => $normal,
+            'pendek' => $pendek,
+            'sangat_pendek' =>  $sangatPendek,
         ];
     }
 
-    public function laporanLingkarKepala()
+    public function laporanLingkarKepala($latestStatistik)
     {
-        $makrosefali = $this->anak()->where('lingkar_kepala_terakhir', 'Makrosefali')->count();
-        $normal = $this->anak()->where('lingkar_kepala_terakhir', 'Normal')->count();
-        $mikrosefali = $this->anak()->where('lingkar_kepala_terakhir', 'Mikrosefali')->count();
+        $makrosefali = 0;
+        $normal = 0;
+        $mikrosefali = 0;
+
+        if ($latestStatistik->status_lingkar_kepala == 'Makrosefali') {
+            $makrosefali++;
+        } else if ($latestStatistik->status_lingkar_kepala == 'Normal') {
+            $normal++;
+        } else if ($latestStatistik->status_lingkar_kepala == 'Mikrosefali') {
+            $mikrosefali++;
+        }
+
         return [
-            'makrosefali' =>       $makrosefali,
-            'normal' =>       $normal,
-            'mikrosefali' =>       $mikrosefali,
+            'makrosefali' => $makrosefali,
+            'normal' => $normal,
+            'mikrosefali' => $mikrosefali,
         ];
     }
 }
