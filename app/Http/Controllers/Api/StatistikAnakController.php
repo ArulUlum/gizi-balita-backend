@@ -150,6 +150,7 @@ class StatistikAnakController extends ApiBaseController
         }
 
         $statistik = StatistikAnak::create([
+            'id_anak' => $request->id_anak,
             'tinggi' => $request->tinggi,
             'berat' => $request->berat,
             'lingkar_kepala' => $request->lingkar_kepala,
