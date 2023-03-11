@@ -113,14 +113,58 @@ class StatistikAnakController extends ApiBaseController
 
     public function update(Request $request, $id)
     {
-        $anak = StatistikAnak::findOrFail($id);
-        if (!$anak) {
+        $statistik = StatistikAnak::findOrFail($id);
+
+        if (!$statistik) {
             return $this->errorNotFound("Data Perkembangan Anak Tidak Ditemukan");
         }
-        $anak->fill($request->all());
-        $anak->save();
 
-        return $this->successResponse("Success Update Data Statistik", $anak);
+        if ($request->z_score_berat <= -3) {
+            $status_berat_badan = 'Sangat Kurus';
+        } else if ($request->z_score_berat > -3 && $request->z_score_berat <= -2) {
+            $status_berat_badan = 'Kurus';
+        } else if ($request->z_score_berat > -2 && $request->z_score_berat <= 1) {
+            $status_berat_badan = 'Normal';
+        } else if ($request->z_score_berat > 1 && $request->z_score_berat <= 2) {
+            $status_berat_badan = 'Gemuk';
+        } else if ($request->z_score_berat > 2) {
+            $status_berat_badan = 'Obesitas';
+        }
+
+        if ($request->z_score_tinggi <= -3) {
+            $status_tinggi_badan = 'Sangat Pendek';
+        } else if ($request->z_score_tinggi > -3 && $request->z_score_tinggi <= -2) {
+            $status_tinggi_badan = 'Pendek';
+        } else if ($request->z_score_tinggi > -2 && $request->z_score_tinggi <= 3) {
+            $status_tinggi_badan = 'Normal';
+        } else if ($request->z_score_tinggi > 3) {
+            $status_tinggi_badan = 'Tinggi';
+        }
+
+        if ($request->z_score_lingkar_kepala > 2) {
+            $status_lingkar_kepala = 'Makrosefalus';
+        } else if ($request->z_score_lingkar_kepala > -2 && $request->z_score_lingkar_kepala <= 2) {
+            $status_lingkar_kepala = 'Normal';
+        } else if ($request->z_score_lingkar_kepala < -2) {
+            $status_lingkar_kepala = 'Microcephaly';
+        }
+
+        $statistik = StatistikAnak::create([
+            'tinggi' => $request->tinggi,
+            'berat' => $request->berat,
+            'lingkar_kepala' => $request->lingkar_kepala,
+            'date' => $request->date,
+            'z_score_berat' => $request->z_score_berat,
+            'z_score_tinggi' => $request->z_score_tinggi,
+            'z_score_lingkar_kepala' => $request->z_score_lingkar_kepala,
+            'status_berat_badan' => $status_berat_badan,
+            'status_tinggi_badan' => $status_tinggi_badan,
+            'status_lingkar_kepala' => $status_lingkar_kepala,
+        ]);
+
+        $statistik->save();
+
+        return $this->successResponse("Success Update Data Statistik");
     }
 
 
