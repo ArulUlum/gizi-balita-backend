@@ -76,4 +76,9 @@ class AuthenticateUserController extends ApiBaseController
     {
         return $this->login($request, "TENAGA_KESEHATAN");
     }
+
+    public function loginAdmin(Request $request)
+    {
+        return $this->login($request, "ADMIN");
+    }
 }
