@@ -304,7 +304,7 @@ class StatistikAnakController extends ApiBaseController
         if (!$anak->delete()) {
             return $this->errorValidationResponse("Gagal Delete Data Perkembangan Anak");
         }
-
+        
         return $this->successResponse("Success Delete Data Statistik");
     }
 }
