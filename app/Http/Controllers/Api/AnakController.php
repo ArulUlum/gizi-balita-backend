@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Anak;
 use App\Models\StatistikAnak;
+use App\Http\Resources\StatistikResource;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use DateTime;
+use DB;
+
 
 class AnakController extends ApiBaseController
 {
@@ -20,7 +25,12 @@ class AnakController extends ApiBaseController
     public function indexWithOrangTua()
     {
         $orangTua = User::getUser(Auth::user());
-        $anak = $orangTua->anak()->get();
+        $fiveNineMonthsAgo = Carbon::now()->subMonths(60)->format('Y-m-d');
+        $anak = $orangTua->anak()->whereDate('tanggal_lahir', '>', $fiveNineMonthsAgo)->orderBy('tanggal_lahir', 'asc')->get();
+
+        foreach ($anak as $key => $item) {
+            $item->anak_ke = $key + 1;
+        }
 
         return $this->successResponse("data anak", $anak);
     }
@@ -33,7 +43,24 @@ class AnakController extends ApiBaseController
     public function indexWithKaderPosyandu()
     {
         $kaderPosyandu = User::getUser(Auth::user());
-        $anak = $kaderPosyandu->posyandu->anak()->get();
+        $fiveNineMonthsAgo = Carbon::now()->subMonths(60)->format('Y-m-d');
+        $anak = $kaderPosyandu->posyandu->anak()->whereDate('tanggal_lahir', '>', $fiveNineMonthsAgo)->get();
+
+        foreach ($anak as $item){
+            $statistik = StatistikAnak::find($item->id);
+            if (empty($statistik)){
+                $item->status_berat_terakhir = NULL;
+                $item->status_tinggi_terakhir = NULL;
+                $item->status_lingkaran_kepala_terakhir = NULL;
+                $item->status_gizi_terakhir = NULL;
+                continue;
+            }
+            $statistik = $statistik->orderBy('date', 'desc')->first();
+            $item->status_berat_terakhir = $statistik->status_berat_badan;
+            $item->status_tinggi_terakhir = $statistik->status_tinggi_badan;
+            $item->status_lingkaran_kepala_terakhir = $statistik->status_lingkar_kepala;
+            $item->status_gizi_terakhir = $statistik->status_gizi;
+        }
 
         return $this->successResponse("data anak", $anak);
     }
@@ -76,6 +103,77 @@ class AnakController extends ApiBaseController
 
         return $this->successResponse("Success");
     }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeWithKaderPosyanduExcel(Request $request)
+    {
+        $user = Auth::user();
+        $validator = validator($request->all(), [
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
+        ]);
+        if ($validator->fails()) {
+            return $this->errorValidationResponse("validation failed", $validator->errors());
+        }
+        $path = $request->file('file')->getRealPath();
+        $data = Excel::toArray([], $path);
+        $z_score = new HitungZScoreController();
+
+        if (count($data) > 0 && count($data[0]) > 0) {
+            foreach ($data[0] as $row) {
+                if ($row[0] != 'No' and $row[0] != ''){
+                    $id_ortu = DB::table('users')->where('nama', '=', $row[6])->value('id');
+                    
+                    $gender = '';
+                    if ($row[5] == 'L' or $row[5] == 'l'){
+                        $gender = 'LAKI_LAKI';
+                    } else if ($row[5] == 'P' or $row[5] == 'p'){
+                        $gender = 'PEREMPUAN';
+                    }
+                    $anak = Anak::create([
+                        'nama' => $row[1],
+                        'panggilan' => $row[2],
+                        'tanggal_lahir' => DateTime::createFromFormat('Y-m-d', $row[3]),
+                        'alamat' => $row[4],
+                        'gender' => $gender,
+                        'id_orang_tua' => $id_ortu,
+                        'id_posyandu' => $user->id_posyandu,
+                        'id_desa' => $user->id_desa,
+                    ]);
+                    $anak->save();
+
+                    $id_anak = DB::table('data_anak')->where('nama', '=', $row[1])->value('id');
+
+                    $hitung_berat = $z_score->HitungZScoreBerat($row[8]);
+                    $hitung_tinggi = $z_score->HitungZScoreTinggi($row[9]);
+                    $hitung_LiLA = $z_score->HitungZScoreLiLA($row[10]);
+
+                    $statistik = StatistikAnak::create([
+                        'id_anak' => $id_anak,
+                        'date' => DateTime::createFromFormat('Y-m-d', $row[7]),
+                        'berat' => $row[8],
+                        'tinggi' => $row[9],
+                        'lingkar_kepala' => $row[10],
+                        'z_score_berat' => $hitung_berat['z_score_berat'],
+                        'z_score_tinggi' => $hitung_tinggi['z_score_tinggi'],
+                        'z_score_lingkar_kepala' => $hitung_LiLA['z_score_lingkar_kepala'],
+                        'status_berat_badan' => $hitung_berat['status_berat_badan'],
+                        'status_tinggi_badan' => $hitung_tinggi['status_tinggi_badan'],
+                        'status_lingkar_kepala' => $hitung_LiLA['status_lingkar_kepala'],
+                    ]);
+            
+                    $statistik->save();
+                }
+            }
+        }
+
+        return $this->successResponse("Success");
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -177,9 +275,12 @@ class AnakController extends ApiBaseController
             return $this->errorValidationResponse("Gagal Ekspor Data", $validator->errors());
         }
 
-        $anak = Anak::all();
+        $anak = Anak::where('id_desa', $request->desa);
         $collection = [];
-
+        if ($request->id != NULL){
+            $anak = $anak->where('id_posyandu', $request->id);
+        }
+        $anak = $anak->get();
         foreach ($anak as $data) {
             foreach ($data->statistik as $statistik) {
                 if (Carbon::parse($statistik->date)->month == $request->bulan && Carbon::parse($statistik->date)->year == $request->tahun) {
@@ -189,7 +290,7 @@ class AnakController extends ApiBaseController
         }
 
         if (empty($collection)) {
-            return $this->errorNotFound("Data Export tidak tersedia di waktu tersebut");
+            return $this->errorNotFound("Data Export tidak tersedia");
         }
 
         $fileName = 'data-anak.csv';
@@ -252,12 +353,10 @@ class AnakController extends ApiBaseController
             return 'Sangat Kurus';
         } else if ($ZScoreBerat > -3 && $ZScoreBerat <= -2) {
             return 'Kurus';
-        } else if ($ZScoreBerat > -2 && $ZScoreBerat <= 1) {
+        } else if ($ZScoreBerat > -2 && $ZScoreBerat <= 2) {
             return 'Normal';
-        } else if ($ZScoreBerat > 1 && $ZScoreBerat <= 2) {
-            return 'Gemuk';
         } else if ($ZScoreBerat > 2) {
-            return 'Obesitas';
+            return 'Gemuk';
         }
     }
 
@@ -267,9 +366,9 @@ class AnakController extends ApiBaseController
             return 'Sangat Pendek';
         } else if ($ZScoreTinggi > -3 && $ZScoreTinggi <= -2) {
             return 'Pendek';
-        } else if ($ZScoreTinggi > -2 && $ZScoreTinggi <= 3) {
+        } else if ($ZScoreTinggi > -2 && $ZScoreTinggi <= 2) {
             return 'Normal';
-        } else if ($ZScoreTinggi > 3) {
+        } else if ($ZScoreTinggi > 2) {
             return 'Tinggi';
         }
     }
@@ -277,11 +376,11 @@ class AnakController extends ApiBaseController
     public function lingkarKepala($ZScoreLingkarKepala)
     {
         if ($ZScoreLingkarKepala > 2) {
-            return 'Makrosefalus';
+            return 'Makrosefali';
         } else if ($ZScoreLingkarKepala > -2 && $ZScoreLingkarKepala <= 2) {
             return 'Normal';
         } else if ($ZScoreLingkarKepala < -2) {
-            return 'Microcephaly';
+            return 'Mikrosefali';
         }
     }
 }

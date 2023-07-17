@@ -34,6 +34,15 @@ class RegisterUserController extends ApiBaseController
         if ($validator->fails()) {
             return $this->errorValidationResponse("gagal registrasi", $validator->errors());
         }
+        $email = $request->input('email');
+
+        $user = User::where('email', $email)->first();
+
+        if ($user) {
+            // Email exists in the database
+            return response()->json(['message' => 'Email is registered']);
+        }
+
 
         $role = Role::where('role', $role)->first();
 

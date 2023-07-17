@@ -57,6 +57,40 @@ class AuthenticateUserController extends ApiBaseController
         return $this->errorValidationResponse("periksa kembail email dan password");
     }
 
+    public function loginbaru(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorValidationResponse("gagal login", $validator->errors());
+        }
+
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = Auth::user();
+            $data = [
+                'token' => [
+                    'type' => "Bearer",
+                    'value' => $user->createToken('API Token')->plainTextToken,
+                ],
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->nama,
+                    'email' => $user->email,
+                    'id_desa' => $user->desa->id,
+                    'id_posyandu' => $user->posyandu->id,
+                    'role' => $user->role->role
+                ],
+            ];
+
+            return $this->successResponse("berhasil login", $data);
+        }
+
+        return $this->errorValidationResponse("periksa kembail email dan password");
+    }
+
     public function loginOrangTua(Request $request)
     {
         return $this->login($request, "ORANG_TUA");

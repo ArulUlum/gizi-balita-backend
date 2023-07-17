@@ -34,7 +34,7 @@ class Posyandu extends Model
         return $this->anak()->count();
     }
 
-    public function laporanBerat($latestStatistik)
+    public function laporanBerat($allLatsStatistik)
     {
         $obesitas = 0;
         $gemuk = 0;
@@ -42,20 +42,23 @@ class Posyandu extends Model
         $kurus = 0;
         $sangatKurus = 0;
 
-        if ($latestStatistik->status_berat_badan == 'Obesitas') {
-            $obesitas++;
-        } else if ($latestStatistik->status_berat_badan == 'Gemuk') {
-            $gemuk++;
-        } else if ($latestStatistik->status_berat_badan == 'Normal') {
-            $normal++;
-        } else if ($latestStatistik->status_berat_badan == 'Kurus') {
-            $kurus++;
-        } else if ($latestStatistik->status_berat_badan == 'Sangat Kurus') {
-            $sangatKurus++;
+        if($allLatsStatistik != NULL){
+            foreach ($allLatsStatistik as $latestStatistik){
+                if($latestStatistik != NULL){
+                    if ($latestStatistik->status_berat_badan == 'Gemuk') {
+                        $gemuk++;
+                    } else if ($latestStatistik->status_berat_badan == 'Normal') {
+                        $normal++;
+                    } else if ($latestStatistik->status_berat_badan == 'Kurus') {
+                        $kurus++;
+                    } else if ($latestStatistik->status_berat_badan == 'Sangat Kurus') {
+                        $sangatKurus++;
+                    }
+                }
+            }
         }
 
         return [
-            'obesitas' => $obesitas,
             'gemuk' => $gemuk,
             'normal' => $normal,
             'kurus' => $kurus,
@@ -63,7 +66,7 @@ class Posyandu extends Model
         ];
     }
 
-    public function laporanTinggi($latestStatistik)
+    public function laporanTinggi($allLatsStatistik)
     {
 
         $tinggi = 0;
@@ -71,14 +74,20 @@ class Posyandu extends Model
         $pendek = 0;
         $sangatPendek = 0;
 
-        if ($latestStatistik->status_tinggi_badan == 'Tinggi') {
-            $tinggi++;
-        } else if ($latestStatistik->status_tinggi_badan == 'Normal') {
-            $normal++;
-        } else if ($latestStatistik->status_tinggi_badan == 'Pendek') {
-            $pendek++;
-        } else if ($latestStatistik->status_tinggi_badan == 'Sangat Pendek') {
-            $sangatPendek++;
+        if($allLatsStatistik != NULL){
+            foreach ($allLatsStatistik as $latestStatistik){
+                if($latestStatistik != NULL){
+                    if ($latestStatistik->status_tinggi_badan == 'Tinggi') {
+                        $tinggi++;
+                    } else if ($latestStatistik->status_tinggi_badan == 'Normal') {
+                        $normal++;
+                    } else if ($latestStatistik->status_tinggi_badan == 'Pendek') {
+                        $pendek++;
+                    } else if ($latestStatistik->status_tinggi_badan == 'Sangat Pendek') {
+                        $sangatPendek++;
+                    }
+                }
+            }
         }
 
         return [
@@ -89,18 +98,24 @@ class Posyandu extends Model
         ];
     }
 
-    public function laporanLingkarKepala($latestStatistik)
+    public function laporanLingkarKepala($allLatsStatistik)
     {
         $makrosefali = 0;
         $normal = 0;
         $mikrosefali = 0;
 
-        if ($latestStatistik->status_lingkar_kepala == 'Makrosefali') {
-            $makrosefali++;
-        } else if ($latestStatistik->status_lingkar_kepala == 'Normal') {
-            $normal++;
-        } else if ($latestStatistik->status_lingkar_kepala == 'Mikrosefali') {
-            $mikrosefali++;
+        if($allLatsStatistik != NULL){
+            foreach ($allLatsStatistik as $latestStatistik){
+                if($latestStatistik != NULL){
+                    if ($latestStatistik->status_lingkar_kepala == 'Makrosefali') {
+                        $makrosefali++;
+                    } else if ($latestStatistik->status_lingkar_kepala == 'Normal') {
+                        $normal++;
+                    } else if ($latestStatistik->status_lingkar_kepala == 'Mikrosefali') {
+                        $mikrosefali++;
+                    }
+                }
+            }
         }
 
         return [

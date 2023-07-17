@@ -8,6 +8,10 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PosyanduController;
 use App\Http\Controllers\Api\StatistikAnakController;
 use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\AiController;
+use App\Http\Controllers\Api\ArtikelController;
+use App\Http\Controllers\Api\ReminderController;
+use App\Http\Controllers\Api\KategoriController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -50,6 +54,8 @@ Route::delete('comment/{id}', [CommentController::class, 'destroy']);
 // START: Endpoint Post
 Route::post('post', [PostController::class, 'store']);
 Route::get('post', [PostController::class, 'index']);
+Route::get('ganti', [PostController::class, 'changeobesitas']);
+Route::get('gantiLK', [PostController::class, 'changestatusLK']);
 Route::get('post/orang-tua/{id}', [PostController::class, 'showByOrangTua']);
 Route::get('post/{id}', [PostController::class, 'show']);
 Route::put('post/{id}', [PostController::class, 'update']);
@@ -67,6 +73,7 @@ Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
     Route::put('data-anak/{id}', [AnakController::class, 'update']);
 
     Route::post('statistik-anak', [StatistikAnakController::class, 'store']);
+    Route::get('statistik-anak-all', [StatistikAnakController::class, 'ShowAllByOrtu']);
     Route::get('statistik-anak/{statistikAnak}', [StatistikAnakController::class, 'show']);
     Route::put('statistik-anak/{id}', [StatistikAnakController::class, 'update']);
 });
@@ -74,6 +81,7 @@ Route::prefix("orang-tua")->middleware('auth:sanctum')->group(function () {
 Route::prefix("posyandu")->middleware('auth:sanctum')->group(function () {
     Route::get('orang-tua', [OrangTuaController::class, 'index']);
     Route::post('data-anak', [AnakController::class, 'storeWithKaderPosyandu']);
+    Route::post('data-anak-excel', [AnakController::class, 'storeWithKaderPosyanduExcel']);
     Route::get('data-anak', [AnakController::class, 'indexWithKaderPosyandu']);
     Route::get('data-anak/{id}', [AnakController::class, 'show']);
     Route::put('data-anak/{id}', [AnakController::class, 'update']);
@@ -88,6 +96,24 @@ Route::prefix("posyandu")->middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->post('upload-image', [UploadController::class, 'store']);
 Route::middleware('auth:sanctum')->get('image/{fileName}', [UploadController::class, 'index']);
 
+Route::middleware('auth:sanctum')->get('cari-artikel', [AiController::class, 'searchArticle']);
+Route::middleware('auth:sanctum')->get('artikel', [ArtikelController::class, 'index']);
+Route::middleware('auth:sanctum')->post('artikel', [ArtikelController::class, 'store']);
+Route::get('artikel/{id}', [ArtikelController::class, 'show']);
+Route::middleware('auth:sanctum')->post('artikel/{id}', [ArtikelController::class, 'update']);
+Route::middleware('auth:sanctum')->delete('artikel/{id}', [ArtikelController::class, 'destroy']);
+Route::middleware('auth:sanctum')->get('artikel/{id}/image', [ArtikelController::class, 'getImage']);
+
+Route::middleware('auth:sanctum')->get('reminderall', [ReminderController::class, 'index']);
+Route::middleware('auth:sanctum')->post('reminder', [ReminderController::class, 'store']);
+Route::middleware('auth:sanctum')->get('reminder', [ReminderController::class, 'show']);
+Route::middleware('auth:sanctum')->delete('reminder/{id}', [ReminderController::class, 'destroy']);
+Route::middleware('auth:sanctum')->put('reminder/{id}', [ReminderController::class, 'update']);
+
+Route::get('kategori', [KategoriController::class, 'index']);
+Route::post('kategori', [KategoriController::class, 'store']);
+Route::put('kategori/{id}', [KategoriController::class, 'update']);
+Route::delete('kategori/{id}', [KategoriController::class, 'destroy']);
 /* Route::prefix('orang-PosyanduControlleriddleware('auth:sanctum')->group(function () { */
 /*     Route::post('data-anak', []) */
 /* }); */

@@ -50,6 +50,8 @@ Route::prefix("admin")->group(function () {
     Route::post('login', [AuthenticateUserController::class, 'loginAdmin']);
 });
 
+Route::post('login', [AuthenticateUserController::class, 'loginbaru']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -56,14 +56,18 @@ class PosyanduController extends ApiBaseController
 
     public function destroy($id)
     {
-        $posyandu = Posyandu::findOrFail($id);
+        try{
+            $posyandu = Posyandu::find($id);
 
-        if (empty($posyandu)) {
-            return $this->errorNotFound("Posyandu tidak ditemukan");
+            if (empty($posyandu)) {
+                return $this->errorNotFound("Posyandu tidak ditemukan");
+            }
+
+            $posyandu->delete();
+
+            return $this->successResponse("Success Delete Posyandu");
+        } catch (\Exception $e){
+            return $this->errorValidationResponse("Error Delete Posyandu", $e->getMessage());
         }
-
-        $posyandu->delete();
-
-        return $this->successResponse("Success Delete Posyandu");
     }
 }

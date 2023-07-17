@@ -19,6 +19,7 @@ class StatistikResource extends JsonResource
             "berat" => $this->kategoriBerat(),
             "tinggi" => $this->kategoriTinggi(),
             "lingkar_kepala" => $this->kategoriLingkarKepala(),
+            "gizi" => $this->kategoriGizi(),
 
         ];
         $parent['statistik'] = $statistik;

@@ -95,7 +95,7 @@ class DesaController extends ApiBaseController
 
     public function getStatistikDesa($id)
     {
-        $desa = Desa::findOrFail($id);
+        $desa = Desa::find($id);
 
         if (empty($desa)) {
             return $this->errorNotFound("Desa tidak ditemukan");
@@ -106,27 +106,12 @@ class DesaController extends ApiBaseController
         $latestStatistik = null;
 
         foreach ($all_posyandu as $key => $posyandu) {
-            if (!empty($posyandu->anak)) {
-                foreach ($posyandu->anak as $anak) {
-                    $latestStatistik = DB::table('data_statistik_anak')->where('id_anak', $anak->id)->latest('created_at')->first();
-                }
-
-                $response[$key] = [
-                    "id_posyandu" => $posyandu->id,
-                    "nama_posyandu" => $posyandu->nama,
-                    "jumlah_anak" => $posyandu->jumlahAnak(),
-                    "berat_badan" => $posyandu->laporanBerat($latestStatistik),
-                    "tinggi_badan" => $posyandu->laporanTinggi($latestStatistik),
-                    "lingkar_kepala" => $posyandu->laporanLingkarKepala($latestStatistik),
-                ];
-            }
 
             $response[$key] = [
                 "id_posyandu" => $posyandu->id,
                 "nama_posyandu" => $posyandu->nama,
                 "jumlah_anak" => 0,
                 "berat_badan" => [
-                    'obesitas' => 0,
                     'gemuk' => 0,
                     'normal' => 0,
                     'kurus' => 0,
@@ -144,6 +129,24 @@ class DesaController extends ApiBaseController
                     'mikrosefali' => 0,
                 ],
             ];
+
+            if (!empty($posyandu->anak)) {
+                $allLatsStatistik = [];
+                foreach ($posyandu->anak as $anak) {
+                    $latestStatistik = DB::table('data_statistik_anak')->where('id_anak', $anak->id)->latest('created_at')->first();
+                    $allLatsStatistik[] = $latestStatistik;
+                }
+
+                $response[$key] = [
+                    "id_posyandu" => $posyandu->id,
+                    "nama_posyandu" => $posyandu->nama,
+                    "jumlah_anak" => $posyandu->jumlahAnak(),
+                    "berat_badan" => $posyandu->laporanBerat($allLatsStatistik),
+                    "tinggi_badan" => $posyandu->laporanTinggi($allLatsStatistik),
+                    "lingkar_kepala" => $posyandu->laporanLingkarKepala($allLatsStatistik),
+                ];
+            }
+
         };
 
         return $this->successResponse("Data Statistik Desa", $response);

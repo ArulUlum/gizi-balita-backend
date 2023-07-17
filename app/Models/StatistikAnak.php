@@ -24,7 +24,9 @@ class StatistikAnak extends Model
         'id_anak',
         "status_berat_badan",
         "status_tinggi_badan",
-        "status_lingkar_kepala"
+        "status_lingkar_kepala",
+        "z_score_gizi",
+        "status_gizi"
     ];
 
     public function anak()
@@ -34,12 +36,11 @@ class StatistikAnak extends Model
 
     public function kategoriBerat()
     {
+        $berat = '';
         $zscore = $this->z_score_berat;
         if ($zscore > 2) {
-            $berat = 'Obesitas';
-        } elseif ($zscore > 1 && $zscore <= 2) {
             $berat = 'Gemuk';
-        } elseif ($zscore > -2 && $zscore <= 1) {
+        } elseif ($zscore > -2 && $zscore <= 2) {
             $berat = 'Normal';
         } elseif ($zscore > -3 && $zscore <= -2) {
             $berat = 'Kurus';
@@ -90,5 +91,29 @@ class StatistikAnak extends Model
         }
 
         return $lingkarKepala;
+    }
+
+    public function kategoriGizi()
+    {
+        $zscore = $this->z_score_gizi;
+        if ($zscore > 3) {
+            $gizi = 'Obesitas';
+        } elseif ($zscore > 2 && $zscore <= 3) {
+            $gizi = 'Gizi Lebih';
+        } elseif ($zscore > 1 && $zscore <= 2) {
+            $gizi = 'Beresiko Gizi Lebih';
+        } elseif ($zscore >= -2 && $zscore <= 1) {
+            $gizi = 'Gizi Baik';
+        } elseif ($zscore >= -3 && $zscore < -2) {
+            $gizi = 'Gizi Kurang';
+        } elseif ($zscore < -3) {
+            $gizi = 'Gizi Buruk';
+        }
+
+        if (empty($this->z_score_gizi)) {
+            return null;
+        }
+
+        return $gizi;
     }
 }

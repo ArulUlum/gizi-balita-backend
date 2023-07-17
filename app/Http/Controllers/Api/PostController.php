@@ -155,4 +155,17 @@ class PostController extends ApiBaseController
 
         return $this->successResponse("Success Delete Data Post");
     }
+
+    public function changeobesitas(){
+        $obe = DB::table('data_statistik_anak')->where('status_berat_badan', 'Obesitas')->update(array('status_berat_badan' => 'Gemuk'));
+
+        return $this->successResponse("Success Data");
+    }
+
+    public function changestatusLK(){
+        $LK1 = DB::table('data_statistik_anak')->where('status_lingkar_kepala', 'Makrosefalus')->update(array('status_lingkar_kepala' => 'Makrosefali'));
+        $LK2 = DB::table('data_statistik_anak')->where('status_lingkar_kepala', 'Microcephaly')->update(array('status_lingkar_kepala' => 'Mikrosefali'));
+
+        return $this->successResponse("Success Data");
+    }
 }
