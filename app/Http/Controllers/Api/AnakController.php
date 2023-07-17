@@ -47,19 +47,23 @@ class AnakController extends ApiBaseController
         $anak = $kaderPosyandu->posyandu->anak()->whereDate('tanggal_lahir', '>', $fiveNineMonthsAgo)->get();
 
         foreach ($anak as $item){
-            $statistik = StatistikAnak::find($item->id);
-            if (empty($statistik)){
+            $statistik = $item->statistik()->orderBy('date', 'desc')->get();
+            if (count($statistik) == 0){
                 $item->status_berat_terakhir = NULL;
                 $item->status_tinggi_terakhir = NULL;
                 $item->status_lingkaran_kepala_terakhir = NULL;
                 $item->status_gizi_terakhir = NULL;
                 continue;
-            }
-            $statistik = $statistik->orderBy('date', 'desc')->first();
-            $item->status_berat_terakhir = $statistik->status_berat_badan;
-            $item->status_tinggi_terakhir = $statistik->status_tinggi_badan;
-            $item->status_lingkaran_kepala_terakhir = $statistik->status_lingkar_kepala;
-            $item->status_gizi_terakhir = $statistik->status_gizi;
+            };
+            
+            $statistik = StatistikResource::collection($statistik);
+            $json = json_encode($statistik[0]);
+            $statik = json_decode($json);
+            
+            $item->status_berat_terakhir = $statik->statistik->berat;
+            $item->status_tinggi_terakhir = $statik->statistik->tinggi;
+            $item->status_lingkaran_kepala_terakhir = $statik->statistik->lingkar_kepala;
+            $item->status_gizi_terakhir = $statik->statistik->gizi;
         }
 
         return $this->successResponse("data anak", $anak);

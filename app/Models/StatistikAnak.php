@@ -64,7 +64,7 @@ class StatistikAnak extends Model
             $tinggi = 'Normal';
         } elseif ($zscore > -3 && $zscore <= -2) {
             $tinggi = 'Pendek';
-        } elseif ($zscore < -3) {
+        } elseif ($zscore <= -3) {
             $tinggi = 'Sangat Pendek';
         }
 
