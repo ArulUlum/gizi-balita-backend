@@ -27,8 +27,8 @@ class RegisterUserController extends ApiBaseController
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6'],
-            'id_desa' => ['required', 'exists:data_desa,id'],
-            'id_posyandu' => ['required', 'exists:data_posyandu,id'],
+            'id_desa' => ['nullable'],
+            'id_posyandu' => ['nullable'],
         ]);
 
         if ($validator->fails()) {
